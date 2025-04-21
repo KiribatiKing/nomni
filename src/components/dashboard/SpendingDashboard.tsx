@@ -1,11 +1,11 @@
-
-import React, { useState, useMemo } from "react";
+import React, { useState, useMemo, useEffect } from "react";
 import { PieChart, Pie, Cell, Tooltip, Legend, ResponsiveContainer } from "recharts";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
 import { Download, PieChart as PieChartIcon, FileText } from "lucide-react";
+import { toast } from "@/hooks/use-toast";
 
 // Mock Data
 const spendingData = [
@@ -37,6 +37,20 @@ export default function SpendingDashboard() {
   const [provider, setProvider] = useState("");
   const [category, setCategory] = useState("");
   const [date, setDate] = useState("");
+
+  useEffect(() => {
+    // Show toast when 80% budget is used and only once per session
+    if (totalSpent >= TOTAL_BUDGET * 0.8) {
+      const alerted = window.sessionStorage.getItem("budget80Alerted");
+      if (!alerted) {
+        toast({
+          title: "Budget Alert",
+          description: `You have used ${((totalSpent / TOTAL_BUDGET) * 100).toFixed(0)}% of your budget.`,
+        });
+        window.sessionStorage.setItem("budget80Alerted", "yes");
+      }
+    }
+  }, []);
 
   // Filtered invoices
   const filteredInvoices = useMemo(() => {
