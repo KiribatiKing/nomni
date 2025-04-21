@@ -6,6 +6,7 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { AuthProvider } from "@/context/AuthContext";
+import { SubscriptionProvider } from "@/context/SubscriptionContext";
 
 // Pages
 import Index from "./pages/Index";
@@ -28,34 +29,36 @@ const App = () => {
     <React.StrictMode>
       <QueryClientProvider client={queryClient}>
         <AuthProvider>
-          <TooltipProvider>
-            <Toaster />
-            <Sonner />
-            <BrowserRouter>
-              <Routes>
-                <Route path="/" element={<Index />} />
-                <Route path="/login" element={<AuthForm mode="login" />} />
-                <Route path="/signup" element={<AuthForm mode="signup" />} />
-                <Route path="/plans" element={<SubscriptionPlans />} />
-                
-                {/* Dashboard Routes */}
-                <Route path="/dashboard" element={<DashboardLayout />}>
-                  <Route index element={<div className="p-4">Dashboard Content</div>} />
-                  <Route path="settings" element={<div className="p-4">Settings Content</div>} />
-                  <Route path="shift" element={<ShiftDashboard />} />
-                  <Route path="spending" element={<SpendingDashboard />} />
-                  <Route path="service-provider" element={<ServiceProviderDashboard />} />
-                </Route>
-                
-                <Route path="/profile" element={<DashboardLayout />}>
-                  <Route index element={<UserProfile />} />
-                </Route>
-                
-                {/* Catch-all route */}
-                <Route path="*" element={<NotFound />} />
-              </Routes>
-            </BrowserRouter>
-          </TooltipProvider>
+          <SubscriptionProvider>
+            <TooltipProvider>
+              <Toaster />
+              <Sonner />
+              <BrowserRouter>
+                <Routes>
+                  <Route path="/" element={<Index />} />
+                  <Route path="/login" element={<AuthForm mode="login" />} />
+                  <Route path="/signup" element={<AuthForm mode="signup" />} />
+                  <Route path="/plans" element={<SubscriptionPlans />} />
+                  
+                  {/* Dashboard Routes */}
+                  <Route path="/dashboard" element={<DashboardLayout />}>
+                    <Route index element={<div className="p-4">Dashboard Content</div>} />
+                    <Route path="settings" element={<div className="p-4">Settings Content</div>} />
+                    <Route path="shift" element={<ShiftDashboard />} />
+                    <Route path="spending" element={<SpendingDashboard />} />
+                    <Route path="service-provider" element={<ServiceProviderDashboard />} />
+                  </Route>
+                  
+                  <Route path="/profile" element={<DashboardLayout />}>
+                    <Route index element={<UserProfile />} />
+                  </Route>
+                  
+                  {/* Catch-all route */}
+                  <Route path="*" element={<NotFound />} />
+                </Routes>
+              </BrowserRouter>
+            </TooltipProvider>
+          </SubscriptionProvider>
         </AuthProvider>
       </QueryClientProvider>
     </React.StrictMode>

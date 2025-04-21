@@ -10,47 +10,35 @@ import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/comp
 import { SubscriptionPlan } from '@/types';
 import { toast } from '@/components/ui/use-toast';
 import { useAuth } from '@/context/AuthContext';
+import { useNavigate } from 'react-router-dom';
 
 const SUBSCRIPTION_PLANS: SubscriptionPlan[] = [
   {
     id: 'basic',
-    name: 'Basic',
-    price: 0,
+    name: 'Basic Plan',
+    price: 10,
     billingCycle: 'monthly',
     features: [
-      'Basic profile',
+      'Limited to 2 linked users',
+      'Basic tracking',
       'Service discovery',
-      'Limited messaging',
-      'Basic support',
-    ],
-  },
-  {
-    id: 'standard',
-    name: 'Standard',
-    price: 9.99,
-    billingCycle: 'monthly',
-    features: [
-      'Enhanced profile',
-      'Advanced service discovery',
-      'Unlimited messaging',
-      'Priority support',
-      'Calendar integration',
-      'Document storage (2GB)',
+      'Standard support',
+      'Document storage (500MB)',
     ],
   },
   {
     id: 'premium',
-    name: 'Premium',
-    price: 19.99,
+    name: 'Premium Plan',
+    price: 50,
     billingCycle: 'monthly',
     features: [
-      'Everything in Standard',
-      'Custom branding (for providers)',
-      'Team access',
-      'Analytics & reporting',
-      'NDIS reporting templates',
+      'Unlimited users',
+      'Advanced tracking',
+      'GPS pings',
+      'Export data',
+      'Priority support',
       'Document storage (10GB)',
-      '24/7 priority support',
+      'Analytics & reporting',
     ],
   },
 ];
@@ -58,14 +46,51 @@ const SUBSCRIPTION_PLANS: SubscriptionPlan[] = [
 const SubscriptionPlans: React.FC = () => {
   const [isYearly, setIsYearly] = useState(false);
   const [selectedPlan, setSelectedPlan] = useState<string | null>(null);
-  const { userRole } = useAuth();
+  const [isLoading, setIsLoading] = useState(false);
+  const { userRole, isAuthenticated } = useAuth();
+  const navigate = useNavigate();
   
-  const handleSelectPlan = (planId: string) => {
+  const handleSelectPlan = async (planId: string) => {
+    if (!isAuthenticated) {
+      toast({
+        title: "Authentication required",
+        description: "Please login or create an account to subscribe to a plan.",
+        variant: "destructive",
+      });
+      navigate('/login');
+      return;
+    }
+    
     setSelectedPlan(planId);
-    toast({
-      title: "Plan selected",
-      description: "Please continue to payment to activate your subscription.",
-    });
+    setIsLoading(true);
+    
+    try {
+      // In a real implementation, this would call a Supabase Edge Function
+      // that creates a Stripe checkout session
+      const response = await fetch('/api/create-checkout', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          planId,
+          isYearly,
+        }),
+      });
+      
+      const { url } = await response.json();
+      
+      // Redirect to Stripe Checkout
+      window.location.href = url;
+    } catch (error) {
+      console.error('Error creating checkout session:', error);
+      toast({
+        title: "Error",
+        description: "Could not process subscription request. Please try again.",
+        variant: "destructive",
+      });
+      setIsLoading(false);
+    }
   };
 
   const getYearlyPrice = (monthlyPrice: number) => {
@@ -77,10 +102,11 @@ const SubscriptionPlans: React.FC = () => {
     switch (userRole) {
       case 'participant':
       case 'caregiver':
-        return 'standard';
+        return 'basic';
       case 'support-worker':
-        return 'standard';
+        return 'basic';
       case 'service-provider':
+      case 'admin':
         return 'premium';
       default:
         return null;
@@ -111,7 +137,7 @@ const SubscriptionPlans: React.FC = () => {
         </div>
       </div>
       
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-6xl mx-auto">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-4xl mx-auto">
         {SUBSCRIPTION_PLANS.map((plan) => (
           <Card 
             key={plan.id} 
@@ -130,7 +156,7 @@ const SubscriptionPlans: React.FC = () => {
             <CardHeader className={`text-center ${plan.id === recommendedPlan ? 'pt-12' : 'pt-6'}`}>
               <CardTitle className="text-2xl">{plan.name}</CardTitle>
               <CardDescription className="text-gray-500">
-                {plan.id === 'basic' ? 'Free Forever' : 'Paid Subscription'}
+                {plan.id === 'free' ? 'Free Forever' : 'Paid Subscription'}
               </CardDescription>
               <div className="mt-4">
                 <span className="text-4xl font-bold">
@@ -158,11 +184,12 @@ const SubscriptionPlans: React.FC = () => {
             </CardContent>
             <CardFooter className="flex flex-col gap-4">
               <Button 
-                className={`w-full ${plan.id !== 'basic' ? 'bg-ndis-blue hover:bg-blue-600' : ''}`}
-                variant={plan.id === 'basic' ? 'outline' : 'default'}
+                className={`w-full bg-ndis-blue hover:bg-blue-600`}
+                variant="default"
                 onClick={() => handleSelectPlan(plan.id)}
+                disabled={isLoading && selectedPlan === plan.id}
               >
-                {plan.id === 'basic' ? 'Continue with Free' : 'Select Plan'}
+                {isLoading && selectedPlan === plan.id ? 'Processing...' : 'Subscribe Now'}
               </Button>
               
               <TooltipProvider>
@@ -174,7 +201,7 @@ const SubscriptionPlans: React.FC = () => {
                     </Button>
                   </TooltipTrigger>
                   <TooltipContent className="max-w-xs">
-                    <p>Additional details and feature specifications for {plan.name} plan.</p>
+                    <p>Additional details and feature specifications for {plan.name}.</p>
                     <p className="mt-2 text-xs">Note: NDIS may cover plan costs for eligible participants.</p>
                   </TooltipContent>
                 </Tooltip>
@@ -190,6 +217,40 @@ const SubscriptionPlans: React.FC = () => {
           <HelpCircle size={16} />
           Need help choosing? <Button variant="link" className="p-0">Contact our support team</Button>
         </p>
+      </div>
+      
+      <div className="mt-8 bg-gray-50 p-6 rounded-lg max-w-2xl mx-auto">
+        <h3 className="text-xl font-semibold mb-4">Subscription Benefits</h3>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div className="flex items-start">
+            <Check className="h-5 w-5 text-green-500 mr-2 mt-1 shrink-0" />
+            <div>
+              <h4 className="font-medium">Premium Support</h4>
+              <p className="text-sm text-gray-600">Priority access to our support team</p>
+            </div>
+          </div>
+          <div className="flex items-start">
+            <Check className="h-5 w-5 text-green-500 mr-2 mt-1 shrink-0" />
+            <div>
+              <h4 className="font-medium">Data Security</h4>
+              <p className="text-sm text-gray-600">Enhanced encryption and backups</p>
+            </div>
+          </div>
+          <div className="flex items-start">
+            <Check className="h-5 w-5 text-green-500 mr-2 mt-1 shrink-0" />
+            <div>
+              <h4 className="font-medium">Regular Updates</h4>
+              <p className="text-sm text-gray-600">Access to the latest features</p>
+            </div>
+          </div>
+          <div className="flex items-start">
+            <Check className="h-5 w-5 text-green-500 mr-2 mt-1 shrink-0" />
+            <div>
+              <h4 className="font-medium">Cancel Anytime</h4>
+              <p className="text-sm text-gray-600">No long-term commitments</p>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   );

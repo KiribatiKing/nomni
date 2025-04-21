@@ -8,6 +8,7 @@ export interface User {
   role: UserRole;
   profilePicture?: string;
   createdAt: string;
+  subscriptionTier?: 'basic' | 'premium' | null;
 }
 
 export interface ParticipantProfile extends User {
@@ -70,4 +71,16 @@ export interface ClientMatch {
   participantName: string;
   supportNeeds: string[];
   compatibility: number; // 0-100 score
+}
+
+export interface StripeSubscription {
+  id: string;
+  status: 'active' | 'canceled' | 'incomplete' | 'incomplete_expired' | 'past_due' | 'trialing' | 'unpaid';
+  currentPeriodEnd: string;
+  plan: {
+    id: string;
+    nickname: string;
+    amount: number;
+    interval: 'month' | 'year';
+  };
 }
