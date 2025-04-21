@@ -11,7 +11,7 @@ const LINKABLE_ROLES: UserRole[] = ["caregiver", "support-worker", "advocate"];
 const ROLE_NAMES: Record<UserRole, string> = {
   participant: "Participant",
   caregiver: "Caregiver",
-  support-worker: "Support Worker",
+  "support-worker": "Support Worker",
   "service-provider": "Service Provider",
   admin: "Admin",
   advocate: "Advocate",
@@ -185,3 +185,4 @@ const ParticipantConnections: React.FC = () => {
 };
 
 export default ParticipantConnections;
+
