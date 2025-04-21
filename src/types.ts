@@ -1,5 +1,4 @@
-
-export type UserRole = 'participant' | 'caregiver' | 'support-worker' | 'service-provider' | 'admin';
+export type UserRole = 'participant' | 'caregiver' | 'support-worker' | 'service-provider' | 'admin' | 'advocate';
 
 export interface User {
   id: string;
