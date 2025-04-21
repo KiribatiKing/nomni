@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { useAuth } from '@/context/AuthContext';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
@@ -11,6 +10,7 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
 import { Pencil, Save, Phone, Mail, Home, CheckCircle2, Clock, Plus } from 'lucide-react';
 import { toast } from '@/components/ui/use-toast';
+import ParticipantConnections from './ParticipantConnections';
 
 const UserProfile: React.FC = () => {
   const { currentUser, userRole } = useAuth();
@@ -23,7 +23,6 @@ const UserProfile: React.FC = () => {
     bio: 'I am an NDIS participant looking for support services in my local area. I enjoy music, art, and outdoor activities.',
   });
 
-  // Dummy data based on user role
   const participantData = {
     ndisNumber: 'NDIS123456',
     supportNeeds: ['Personal Care', 'Community Access', 'Transport'],
@@ -535,6 +534,10 @@ const UserProfile: React.FC = () => {
                 </div>
               </div>
             </div>
+
+            {userRole === "participant" && (
+              <ParticipantConnections />
+            )}
           </TabsContent>
           <TabsContent value="role-specific" className="pt-6">
             {renderRoleSpecificContent()}
