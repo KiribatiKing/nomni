@@ -1,7 +1,6 @@
-
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useAuth } from '@/context/AuthContext';
-import { Navigate, Outlet, useLocation, Link } from 'react-router-dom';
+import { Navigate, Outlet, useLocation, Link, useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { 
   Home, 
@@ -24,9 +23,16 @@ const DashboardLayout: React.FC = () => {
   const { isAuthenticated, currentUser, isLoading, userRole } = useAuth();
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const location = useLocation();
+  const navigate = useNavigate();
 
   const toggleSidebar = () => setSidebarOpen(!sidebarOpen);
   const closeSidebar = () => setSidebarOpen(false);
+
+  useEffect(() => {
+    if (userRole === 'service-provider' && location.pathname === '/dashboard') {
+      navigate('/dashboard/service-provider');
+    }
+  }, [userRole, location.pathname, navigate]);
 
   if (isLoading) {
     return (
@@ -44,7 +50,6 @@ const DashboardLayout: React.FC = () => {
     return <Navigate to="/login" state={{ from: location }} replace />;
   }
 
-  // Determine sidebar menus based on user role
   const getNavItems = () => {
     const commonItems = [
       { icon: Home, label: 'Dashboard', path: '/dashboard' },
@@ -69,8 +74,9 @@ const DashboardLayout: React.FC = () => {
         { icon: DollarSign, label: 'Payments', path: '/payments' },
       ],
       'service-provider': [
-        { icon: Users, label: 'Clients', path: '/clients' },
-        { icon: Calendar, label: 'Bookings', path: '/bookings' },
+        { icon: Home, label: 'Dashboard', path: '/dashboard/service-provider' },
+        { icon: Users, label: 'Support Workers', path: '/dashboard/service-provider' },
+        { icon: Calendar, label: 'Roster', path: '/dashboard/service-provider' },
         { icon: DollarSign, label: 'Revenue', path: '/revenue' },
       ],
       'admin': [
@@ -80,6 +86,10 @@ const DashboardLayout: React.FC = () => {
       ],
     };
 
+    if (userRole === 'service-provider') {
+      return [...(roleItems[userRole] || [])];
+    }
+
     return [...(roleItems[userRole || 'participant'] || []), ...commonItems];
   };
 
@@ -87,7 +97,6 @@ const DashboardLayout: React.FC = () => {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      {/* Mobile Header */}
       <header className="lg:hidden bg-white border-b sticky top-0 z-30">
         <div className="flex items-center justify-between p-4">
           <Button 
@@ -114,14 +123,12 @@ const DashboardLayout: React.FC = () => {
         </div>
       </header>
 
-      {/* Sidebar */}
       <div className={`
         fixed inset-y-0 left-0 z-50
         w-64 bg-white border-r transform transition-transform duration-300 ease-in-out
         ${sidebarOpen ? 'translate-x-0' : '-translate-x-full'}
         lg:translate-x-0 lg:static
       `}>
-        {/* Sidebar Header */}
         <div className="p-4 border-b">
           <Link to="/" className="flex items-center gap-2">
             <div className="w-8 h-8 rounded-full bg-ndis-blue flex items-center justify-center">
@@ -131,7 +138,6 @@ const DashboardLayout: React.FC = () => {
           </Link>
         </div>
         
-        {/* User info */}
         <div className="p-4 border-b">
           <div className="flex items-center gap-3">
             <Avatar>
@@ -149,7 +155,6 @@ const DashboardLayout: React.FC = () => {
           </div>
         </div>
         
-        {/* Navigation Links */}
         <nav className="p-4 space-y-2">
           {navItems.map((item) => (
             <Link
@@ -171,14 +176,12 @@ const DashboardLayout: React.FC = () => {
         </nav>
       </div>
 
-      {/* Main Content */}
       <div className="lg:ml-64">
         <main className="p-4 md:p-6 max-w-7xl mx-auto">
           <Outlet />
         </main>
       </div>
       
-      {/* Mobile sidebar backdrop */}
       {sidebarOpen && (
         <div 
           className="fixed inset-0 bg-black/50 z-40 lg:hidden"

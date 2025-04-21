@@ -1,3 +1,4 @@
+
 export type UserRole = 'participant' | 'caregiver' | 'support-worker' | 'service-provider' | 'admin' | 'advocate';
 
 export interface User {
@@ -51,4 +52,22 @@ export interface SubscriptionPlan {
   price: number;
   billingCycle: 'monthly' | 'yearly';
   features: string[];
+}
+
+export interface Shift {
+  id: string;
+  workerId: string;
+  participantId: string;
+  date: string;
+  startTime: string;
+  endTime: string;
+  notes?: string;
+  status: 'scheduled' | 'completed' | 'cancelled';
+}
+
+export interface ClientMatch {
+  participantId: string;
+  participantName: string;
+  supportNeeds: string[];
+  compatibility: number; // 0-100 score
 }
