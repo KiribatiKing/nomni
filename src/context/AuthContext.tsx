@@ -59,6 +59,7 @@ const MOCK_USERS = [
   },
 ];
 
+// Fixed component definition to properly define it as a React functional component
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [currentUser, setCurrentUser] = useState<User | null>(null);
   const [isLoading, setIsLoading] = useState(true);
