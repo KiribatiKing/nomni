@@ -21,7 +21,7 @@ const Index: React.FC = () => {
               Connecting NDIS Participants with Support Services
             </h1>
             <p className="text-lg md:text-xl max-w-3xl mx-auto mb-8 text-blue-50">
-              AccessSupport Hub brings together participants, caregivers, support workers, and service providers in one easy-to-use platform.
+              Nomni Support brings together participants, caregivers, support workers, and service providers in one easy-to-use platform.
             </p>
             <div className="flex flex-wrap justify-center gap-4">
               <Button 
@@ -49,7 +49,7 @@ const Index: React.FC = () => {
         <div className="container mx-auto px-4">
           <div className="text-center mb-12">
             <Badge className="mb-2">For Everyone</Badge>
-            <h2 className="text-3xl font-bold">AccessSupport is for</h2>
+            <h2 className="text-3xl font-bold">Nomni Support is for</h2>
           </div>
           
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 max-w-6xl mx-auto">
@@ -129,7 +129,7 @@ const Index: React.FC = () => {
         <div className="container mx-auto px-4">
           <div className="text-center mb-12">
             <Badge className="mb-2">Features</Badge>
-            <h2 className="text-3xl font-bold">What AccessSupport offers</h2>
+            <h2 className="text-3xl font-bold">What Nomni Support offers</h2>
             <p className="text-gray-600 max-w-3xl mx-auto mt-4">
               Our platform provides tools and features designed specifically for the NDIS ecosystem
             </p>
@@ -222,7 +222,7 @@ const Index: React.FC = () => {
         <div className="container mx-auto px-4 text-center">
           <h2 className="text-3xl font-bold mb-6">Ready to get started?</h2>
           <p className="text-xl max-w-3xl mx-auto mb-8">
-            Join AccessSupport today and discover how we can help you navigate the NDIS ecosystem.
+            Join Nomni Support today and discover how we can help you navigate the NDIS ecosystem.
           </p>
           <div className="flex flex-wrap justify-center gap-4">
             <Button 
@@ -249,7 +249,7 @@ const Index: React.FC = () => {
         <div className="container mx-auto px-4">
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
             <div>
-              <h3 className="text-xl font-bold mb-4">AccessSupport Hub</h3>
+              <h3 className="text-xl font-bold mb-4">Nomni Support Hub</h3>
               <p className="text-gray-400">
                 Connecting NDIS participants with quality support services.
               </p>
@@ -275,13 +275,13 @@ const Index: React.FC = () => {
             <div>
               <h3 className="text-lg font-bold mb-4">Contact Us</h3>
               <address className="not-italic text-gray-400">
-                <p>Email: info@accesssupport.com</p>
-                <p>Phone: 1800 ACCESS (123 456)</p>
+                <p>Email: info@nomnisupport.com</p>
+                <p>Phone: 1800 NOMNI (123 456)</p>
               </address>
             </div>
           </div>
           <div className="mt-12 pt-8 border-t border-gray-700 text-center text-gray-400">
-            <p>&copy; {new Date().getFullYear()} AccessSupport Hub. All rights reserved.</p>
+            <p>&copy; {new Date().getFullYear()} Nomni Support Hub. All rights reserved.</p>
           </div>
         </div>
       </footer>
@@ -290,3 +290,4 @@ const Index: React.FC = () => {
 };
 
 export default Index;
+

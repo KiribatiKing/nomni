@@ -100,9 +100,9 @@ const DashboardLayout: React.FC = () => {
           
           <Link to="/" className="flex items-center gap-2">
             <div className="w-6 h-6 rounded-full bg-ndis-blue flex items-center justify-center">
-              <span className="text-white font-bold text-xs">AS</span>
+              <span className="text-white font-bold text-xs">NS</span>
             </div>
-            <span className="font-bold text-lg text-ndis-blue">AccessSupport</span>
+            <span className="font-bold text-lg text-ndis-blue">Nomni Support</span>
           </Link>
           
           <Button 
@@ -125,9 +125,9 @@ const DashboardLayout: React.FC = () => {
         <div className="p-4 border-b">
           <Link to="/" className="flex items-center gap-2">
             <div className="w-8 h-8 rounded-full bg-ndis-blue flex items-center justify-center">
-              <span className="text-white font-bold">AS</span>
+              <span className="text-white font-bold">NS</span>
             </div>
-            <span className="font-bold text-xl text-ndis-blue">AccessSupport</span>
+            <span className="font-bold text-xl text-ndis-blue">Nomni Support</span>
           </Link>
         </div>
         

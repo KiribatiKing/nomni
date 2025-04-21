@@ -23,9 +23,9 @@ const Navigation: React.FC = () => {
         <div className="h-16 flex items-center justify-between">
           <Link to="/" className="flex items-center gap-2">
             <div className="w-8 h-8 rounded-full bg-ndis-blue flex items-center justify-center">
-              <span className="text-white font-bold">AS</span>
+              <span className="text-white font-bold">NS</span>
             </div>
-            <span className="font-bold text-xl text-ndis-blue">AccessSupport</span>
+            <span className="font-bold text-xl text-ndis-blue">Nomni Support</span>
           </Link>
 
           {/* Desktop Navigation */}
@@ -182,3 +182,4 @@ const Navigation: React.FC = () => {
 };
 
 export default Navigation;
+
