@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
@@ -17,6 +16,7 @@ import DashboardLayout from "./components/dashboard/DashboardLayout";
 import UserProfile from "./components/dashboard/UserProfile";
 import SubscriptionPlans from "./components/plans/SubscriptionPlans";
 import ShiftDashboard from "./components/dashboard/ShiftDashboard";
+import SpendingDashboard from "./components/dashboard/SpendingDashboard";
 
 // Create a new QueryClient instance outside of the component
 const queryClient = new QueryClient();
@@ -41,6 +41,7 @@ const App = () => {
                   <Route index element={<div className="p-4">Dashboard Content</div>} />
                   <Route path="settings" element={<div className="p-4">Settings Content</div>} />
                   <Route path="shift" element={<ShiftDashboard />} />
+                  <Route path="spending" element={<SpendingDashboard />} />
                 </Route>
                 
                 <Route path="/profile" element={<DashboardLayout />}>
