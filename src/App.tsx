@@ -1,4 +1,3 @@
-
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -15,6 +14,7 @@ import AuthForm from "./components/auth/AuthForm";
 import DashboardLayout from "./components/dashboard/DashboardLayout";
 import UserProfile from "./components/dashboard/UserProfile";
 import SubscriptionPlans from "./components/plans/SubscriptionPlans";
+import ShiftDashboard from "./components/dashboard/ShiftDashboard";
 
 const queryClient = new QueryClient();
 
@@ -35,6 +35,7 @@ const App = () => (
             <Route path="/dashboard" element={<DashboardLayout />}>
               <Route index element={<div className="p-4">Dashboard Content</div>} />
               <Route path="settings" element={<div className="p-4">Settings Content</div>} />
+              <Route path="shift" element={<ShiftDashboard />} />
             </Route>
             
             <Route path="/profile" element={<DashboardLayout />}>
