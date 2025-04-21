@@ -20,10 +20,10 @@ import ShiftDashboard from "./components/dashboard/ShiftDashboard";
 import SpendingDashboard from "./components/dashboard/SpendingDashboard";
 import ServiceProviderDashboard from "./components/dashboard/ServiceProviderDashboard";
 
-// Create a new QueryClient instance outside of the component
-const queryClient = new QueryClient();
-
 const App = () => {
+  // Create a new QueryClient instance inside the component
+  const queryClient = new QueryClient();
+  
   return (
     <React.StrictMode>
       <QueryClientProvider client={queryClient}>

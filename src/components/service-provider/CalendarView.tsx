@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Calendar } from "@/components/ui/calendar";
@@ -129,11 +128,11 @@ const CalendarView: React.FC = () => {
               onMonthChange={setCurrentMonth}
               className="pointer-events-auto"
               components={{
-                DayContent: ({ day }) => {
-                  const count = getShiftCountForDay(day);
+                DayContent: (props) => {
+                  const count = getShiftCountForDay(props.date);
                   return (
                     <div className="relative w-full h-full flex items-center justify-center">
-                      {day.getDate()}
+                      {props.date.getDate()}
                       {count > 0 && (
                         <span className="absolute bottom-0 right-0 w-2 h-2 bg-blue-500 rounded-full"></span>
                       )}
