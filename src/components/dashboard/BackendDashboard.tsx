@@ -41,6 +41,18 @@ const mockInvoices = [
   { id: 105, providerId: 2, providerName: "Provider B", date: "2025-04-20", amount: 750, category: "Speech", status: "pending" },
 ];
 
+// Define interface for provider totals
+interface ProviderTotal {
+  providerName: string;
+  total: number;
+  paid: number;
+  pending: number;
+}
+
+interface ProviderTotalsMap {
+  [providerId: number]: ProviderTotal;
+}
+
 const BackendDashboard = () => {
   const [activeTab, setActiveTab] = useState("shifts");
   const [searchQuery, setSearchQuery] = useState("");
@@ -59,8 +71,8 @@ const BackendDashboard = () => {
     invoice.category.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
-  // Calculate provider totals
-  const providerTotals = mockInvoices.reduce((acc, invoice) => {
+  // Calculate provider totals with proper typing
+  const providerTotals: ProviderTotalsMap = mockInvoices.reduce((acc: ProviderTotalsMap, invoice) => {
     if (!acc[invoice.providerId]) {
       acc[invoice.providerId] = {
         providerName: invoice.providerName,
