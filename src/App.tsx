@@ -20,6 +20,7 @@ import SubscriptionPlans from "./components/plans/SubscriptionPlans";
 import ShiftDashboard from "./components/dashboard/ShiftDashboard";
 import SpendingDashboard from "./components/dashboard/SpendingDashboard";
 import ServiceProviderDashboard from "./components/dashboard/ServiceProviderDashboard";
+import BackendDashboard from "./components/dashboard/BackendDashboard";
 
 const App = () => {
   // Create a new QueryClient instance inside the component
@@ -47,6 +48,7 @@ const App = () => {
                     <Route path="shift" element={<ShiftDashboard />} />
                     <Route path="spending" element={<SpendingDashboard />} />
                     <Route path="service-provider" element={<ServiceProviderDashboard />} />
+                    <Route path="backend" element={<BackendDashboard />} />
                   </Route>
                   
                   <Route path="/profile" element={<DashboardLayout />}>
