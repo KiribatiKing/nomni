@@ -46,21 +46,44 @@ const AuthForm: React.FC<AuthFormProps> = ({ mode }) => {
           title: "Login successful!",
           description: "Welcome back to Nomni Support.",
         });
+        navigate('/dashboard');
       } else {
         console.log("Attempting signup with:", { email, name, role });
+        
+        // Validate inputs
         if (!name.trim()) {
           throw new Error('Name is required');
         }
+        
+        if (password.length < 6) {
+          throw new Error('Password must be at least 6 characters long');
+        }
+        
         await signup(email, password, name, role);
         toast({
           title: "Account created successfully!",
           description: "Welcome to Nomni Support. You can now log in.",
         });
+        navigate('/dashboard');
       }
-      navigate('/dashboard');
     } catch (err) {
       console.error("Auth error:", err);
-      const errorMessage = err instanceof Error ? err.message : 'An error occurred during authentication';
+      let errorMessage = 'An error occurred during authentication';
+      
+      // Handle specific Supabase error messages
+      if (err instanceof Error) {
+        errorMessage = err.message;
+        
+        // Improve error messages
+        if (errorMessage.includes('already registered')) {
+          errorMessage = 'This email is already registered. Please try logging in instead.';
+        } else if (errorMessage.includes('invalid email')) {
+          errorMessage = 'Please enter a valid email address';
+        } else if (errorMessage.includes('database error')) {
+          errorMessage = 'Registration failed. The system couldn\'t create your profile. Please try again.';
+        }
+      }
+      
       setError(errorMessage);
       toast({
         variant: "destructive",
@@ -145,7 +168,13 @@ const AuthForm: React.FC<AuthFormProps> = ({ mode }) => {
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               required
+              minLength={6}
             />
+            {mode === 'signup' && (
+              <p className="text-xs text-muted-foreground mt-1">
+                Password must be at least 6 characters
+              </p>
+            )}
           </div>
           <Button 
             type="submit" 
