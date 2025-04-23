@@ -22,23 +22,28 @@ const ParticipantDashboard = () => {
   };
 
   return (
-    <div className="flex flex-col items-center p-4 animate-fade-in">
-      <h1 className="text-2xl font-bold mb-6">Participant Dashboard</h1>
+    <div className="flex flex-col items-center justify-center min-h-[80vh] p-4 animate-fade-in">
+      <h1 className="text-3xl font-bold mb-10 text-center">Welcome to Your Dashboard</h1>
       
       <Button 
         onClick={handleShiftButton}
+        variant="default"
         size="lg"
-        className="bg-green-500 hover:bg-green-600 text-white font-bold py-4 px-8 rounded-lg shadow-lg mb-6 w-56 h-20 text-xl flex items-center justify-center gap-2"
+        className="bg-green-500 hover:bg-green-600 text-white font-bold py-6 px-10 rounded-lg shadow-lg mb-8 w-64 h-24 text-2xl flex items-center justify-center gap-3 transform transition-transform hover:scale-105"
       >
-        <Play className="w-6 h-6" />
+        <Play className="w-8 h-8" />
         Start Shift
       </Button>
       
       {!isAuthenticated && (
-        <div className="mt-4 p-4 bg-yellow-100 rounded-md text-yellow-700">
+        <div className="mt-4 p-4 bg-yellow-100 rounded-md text-yellow-700 border border-yellow-300">
           You need to be logged in to use this feature.
         </div>
       )}
+
+      <div className="mt-8 text-center text-gray-600">
+        <p>Click the green button above to start your shift and track your activities.</p>
+      </div>
     </div>
   );
 };
