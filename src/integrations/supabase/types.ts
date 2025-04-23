@@ -101,6 +101,42 @@ export type Database = {
           },
         ]
       }
+      profiles: {
+        Row: {
+          created_at: string
+          email: string
+          id: string
+          meta_data: Json | null
+          name: string
+          profile_picture: string | null
+          role: Database["public"]["Enums"]["user_role"]
+          subscription_tier: string | null
+          updated_at: string | null
+        }
+        Insert: {
+          created_at?: string
+          email: string
+          id: string
+          meta_data?: Json | null
+          name: string
+          profile_picture?: string | null
+          role: Database["public"]["Enums"]["user_role"]
+          subscription_tier?: string | null
+          updated_at?: string | null
+        }
+        Update: {
+          created_at?: string
+          email?: string
+          id?: string
+          meta_data?: Json | null
+          name?: string
+          profile_picture?: string | null
+          role?: Database["public"]["Enums"]["user_role"]
+          subscription_tier?: string | null
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
       service_providers: {
         Row: {
           created_at: string | null
@@ -359,7 +395,13 @@ export type Database = {
       [_ in never]: never
     }
     Enums: {
-      [_ in never]: never
+      user_role:
+        | "participant"
+        | "caregiver"
+        | "support-worker"
+        | "service-provider"
+        | "admin"
+        | "advocate"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -474,6 +516,15 @@ export type CompositeTypes<
 
 export const Constants = {
   public: {
-    Enums: {},
+    Enums: {
+      user_role: [
+        "participant",
+        "caregiver",
+        "support-worker",
+        "service-provider",
+        "admin",
+        "advocate",
+      ],
+    },
   },
 } as const

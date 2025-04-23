@@ -1,127 +1,118 @@
 
 import React, { createContext, useState, useContext, useEffect } from 'react';
-import { User, UserRole } from '@/types';
+import { supabase } from "@/integrations/supabase/client";
+import { UserRole, User } from '@/types';
 
+// AuthContext definition
 interface AuthContextType {
+  session: any;
   currentUser: User | null;
   isAuthenticated: boolean;
   userRole: UserRole | null;
   login: (email: string, password: string) => Promise<void>;
   signup: (email: string, password: string, name: string, role: UserRole) => Promise<void>;
-  logout: () => void;
+  logout: () => Promise<void>;
   isLoading: boolean;
 }
 
-// Create the context with a default value
 const AuthContext = createContext<AuthContextType>({
+  session: null,
   currentUser: null,
   isAuthenticated: false,
   userRole: null,
   login: async () => {},
   signup: async () => {},
-  logout: () => {},
+  logout: async () => {},
   isLoading: true,
 });
 
-// Sample user data for demonstration purposes
-const MOCK_USERS = [
-  {
-    id: '1',
-    email: 'participant@example.com',
-    name: 'Alex Smith',
-    role: 'participant' as UserRole,
-    profilePicture: '',
-    createdAt: new Date().toISOString(),
-  },
-  {
-    id: '2',
-    email: 'caregiver@example.com',
-    name: 'Jamie Brown',
-    role: 'caregiver' as UserRole,
-    profilePicture: '',
-    createdAt: new Date().toISOString(),
-  },
-  {
-    id: '3',
-    email: 'worker@example.com',
-    name: 'Sam Taylor',
-    role: 'support-worker' as UserRole,
-    profilePicture: '',
-    createdAt: new Date().toISOString(),
-  },
-  {
-    id: '4',
-    email: 'provider@example.com',
-    name: 'Jordan Lee',
-    role: 'service-provider' as UserRole,
-    profilePicture: '',
-    createdAt: new Date().toISOString(),
-  },
-];
-
-// Fixed component definition to properly define it as a React functional component
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+  const [session, setSession] = useState<any>(null);
   const [currentUser, setCurrentUser] = useState<User | null>(null);
   const [isLoading, setIsLoading] = useState(true);
 
-  // Check for existing user session on load
+  // Listen to auth state + fetch profile
   useEffect(() => {
-    const storedUser = localStorage.getItem('ndis_user');
-    if (storedUser) {
-      setCurrentUser(JSON.parse(storedUser));
-    }
-    setIsLoading(false);
+    // Subscribe to session events (do this first)
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+      setSession(session);
+      if (session?.user?.id) {
+        fetchUserProfile(session.user.id);
+      } else {
+        setCurrentUser(null);
+      }
+    });
+
+    // On mount, get session
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      setSession(session);
+      if (session?.user?.id) fetchUserProfile(session.user.id);
+      setIsLoading(false);
+    });
+
+    return () => subscription.unsubscribe();
   }, []);
 
-  // Mock login function
+  // Fetch user profile from Supabase
+  const fetchUserProfile = async (userId: string) => {
+    setIsLoading(true);
+    const { data, error } = await supabase
+      .from('profiles')
+      .select('*')
+      .eq('id', userId)
+      .single();
+    if (!error && data) {
+      setCurrentUser({
+        id: data.id,
+        email: data.email,
+        name: data.name,
+        role: data.role,
+        profilePicture: data.profile_picture || undefined,
+        createdAt: data.created_at,
+        subscriptionTier: data.subscription_tier,
+      });
+    } else {
+      setCurrentUser(null);
+    }
+    setIsLoading(false);
+  };
+
+  // Login
   const login = async (email: string, password: string) => {
     setIsLoading(true);
-    
-    // Simulate API call delay
-    await new Promise((resolve) => setTimeout(resolve, 1000));
-    
-    // Find user in mock data
-    const user = MOCK_USERS.find(u => u.email === email);
-    
-    if (user) {
-      setCurrentUser(user);
-      localStorage.setItem('ndis_user', JSON.stringify(user));
-    } else {
-      throw new Error("Invalid credentials");
-    }
-    
+    const { error } = await supabase.auth.signInWithPassword({
+      email,
+      password,
+    });
+    if (error) throw new Error(error.message);
     setIsLoading(false);
   };
 
-  // Mock signup function
+  // Signup
   const signup = async (email: string, password: string, name: string, role: UserRole) => {
     setIsLoading(true);
-    
-    // Simulate API call delay
-    await new Promise((resolve) => setTimeout(resolve, 1000));
-    
-    // Create new user
-    const newUser: User = {
-      id: Math.random().toString(36).substring(2, 15),
+    const { error } = await supabase.auth.signUp({
       email,
-      name,
-      role,
-      createdAt: new Date().toISOString(),
-    };
-    
-    setCurrentUser(newUser);
-    localStorage.setItem('ndis_user', JSON.stringify(newUser));
-    
+      password,
+      options: {
+        data: { name, role }
+      }
+    });
+    if (error) throw new Error(error.message);
     setIsLoading(false);
   };
 
-  // Logout function
-  const logout = () => {
+  // Logout
+  const logout = async () => {
+    setIsLoading(true);
+    await supabase.auth.signOut();
+    setSession(null);
     setCurrentUser(null);
-    localStorage.removeItem('ndis_user');
+    setIsLoading(false);
   };
 
   const value = {
+    session,
     currentUser,
     isAuthenticated: !!currentUser,
     userRole: currentUser?.role || null,
@@ -134,5 +125,5 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 };
 
-// Custom hook to use the auth context
+// Custom hook
 export const useAuth = () => useContext(AuthContext);
