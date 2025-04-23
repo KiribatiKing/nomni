@@ -9,7 +9,348 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
-      [_ in never]: never
+      appointments: {
+        Row: {
+          contact_id: string
+          created_at: string
+          date: string
+          description: string | null
+          due_date: string | null
+          id: string
+          location: string | null
+          time: string
+          title: string
+          user_id: string
+        }
+        Insert: {
+          contact_id: string
+          created_at?: string
+          date: string
+          description?: string | null
+          due_date?: string | null
+          id?: string
+          location?: string | null
+          time: string
+          title: string
+          user_id: string
+        }
+        Update: {
+          contact_id?: string
+          created_at?: string
+          date?: string
+          description?: string | null
+          due_date?: string | null
+          id?: string
+          location?: string | null
+          time?: string
+          title?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "appointments_contact_id_fkey"
+            columns: ["contact_id"]
+            isOneToOne: false
+            referencedRelation: "contacts"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "appointments_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      contacts: {
+        Row: {
+          created_at: string
+          email: string | null
+          id: string
+          name: string
+          phone: string
+          role: string | null
+          user_id: string
+        }
+        Insert: {
+          created_at: string
+          email?: string | null
+          id?: string
+          name: string
+          phone: string
+          role?: string | null
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          email?: string | null
+          id?: string
+          name?: string
+          phone?: string
+          role?: string | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "contacts_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      service_providers: {
+        Row: {
+          created_at: string | null
+          id: string
+          minimum_hours: number | null
+          name: string | null
+          overtime_rate: number | null
+          public_holiday_rate: number | null
+          saturday_rate: number | null
+          sunday_rate: number | null
+          user_id: string | null
+          weekday_rate: number | null
+        }
+        Insert: {
+          created_at?: string | null
+          id?: string
+          minimum_hours?: number | null
+          name?: string | null
+          overtime_rate?: number | null
+          public_holiday_rate?: number | null
+          saturday_rate?: number | null
+          sunday_rate?: number | null
+          user_id?: string | null
+          weekday_rate?: number | null
+        }
+        Update: {
+          created_at?: string | null
+          id?: string
+          minimum_hours?: number | null
+          name?: string | null
+          overtime_rate?: number | null
+          public_holiday_rate?: number | null
+          saturday_rate?: number | null
+          sunday_rate?: number | null
+          user_id?: string | null
+          weekday_rate?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "service_providers_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      shifts: {
+        Row: {
+          created_at: string | null
+          id: string
+          provider_id: string
+          reason_if_early: string
+          shift_date: string
+          shift_end_time: string
+          shift_start_time: string
+          status: string | null
+          support_worker_id: string
+          user_id: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          id?: string
+          provider_id: string
+          reason_if_early: string
+          shift_date: string
+          shift_end_time: string
+          shift_start_time: string
+          status?: string | null
+          support_worker_id: string
+          user_id?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          id?: string
+          provider_id?: string
+          reason_if_early?: string
+          shift_date?: string
+          shift_end_time?: string
+          shift_start_time?: string
+          status?: string | null
+          support_worker_id?: string
+          user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "shifts_provider_id_fkey"
+            columns: ["provider_id"]
+            isOneToOne: false
+            referencedRelation: "service_providers"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "shifts_support_worker_id_fkey"
+            columns: ["support_worker_id"]
+            isOneToOne: false
+            referencedRelation: "support_workers"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "shifts_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      support_workers: {
+        Row: {
+          availability: string | null
+          contact: string
+          created_at: string
+          email: string
+          first_name: string
+          id: string
+          last_name: string | null
+          phone_number: string | null
+          support_provider_id: string
+          updated_at: string | null
+          user_id: string
+        }
+        Insert: {
+          availability?: string | null
+          contact: string
+          created_at?: string
+          email: string
+          first_name: string
+          id?: string
+          last_name?: string | null
+          phone_number?: string | null
+          support_provider_id?: string
+          updated_at?: string | null
+          user_id: string
+        }
+        Update: {
+          availability?: string | null
+          contact?: string
+          created_at?: string
+          email?: string
+          first_name?: string
+          id?: string
+          last_name?: string | null
+          phone_number?: string | null
+          support_provider_id?: string
+          updated_at?: string | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "support_workers_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      tasks: {
+        Row: {
+          created_at: string
+          description: string | null
+          due_date: string
+          id: string
+          priority: string | null
+          status: string
+          task_name: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          description?: string | null
+          due_date: string
+          id?: string
+          priority?: string | null
+          status?: string
+          task_name: string
+          updated_at: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          description?: string | null
+          due_date?: string
+          id?: string
+          priority?: string | null
+          status?: string
+          task_name?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "tasks_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      users: {
+        Row: {
+          address: string | null
+          coordinator_contact: string | null
+          coordinator_name: string | null
+          created_at: string
+          date_of_birth: string | null
+          email: string
+          first_name: string
+          funding_amount: number
+          id: string
+          last_name: string
+          phone_number: string
+          role: string
+          updated_at: string | null
+        }
+        Insert: {
+          address?: string | null
+          coordinator_contact?: string | null
+          coordinator_name?: string | null
+          created_at?: string
+          date_of_birth?: string | null
+          email: string
+          first_name: string
+          funding_amount: number
+          id?: string
+          last_name: string
+          phone_number: string
+          role: string
+          updated_at?: string | null
+        }
+        Update: {
+          address?: string | null
+          coordinator_contact?: string | null
+          coordinator_name?: string | null
+          created_at?: string
+          date_of_birth?: string | null
+          email?: string
+          first_name?: string
+          funding_amount?: number
+          id?: string
+          last_name?: string
+          phone_number?: string
+          role?: string
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
