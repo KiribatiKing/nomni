@@ -1,6 +1,6 @@
 
-import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import React, { useState, useEffect } from 'react';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '@/context/AuthContext';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
@@ -18,12 +18,21 @@ interface AuthFormProps {
 
 const AuthForm: React.FC<AuthFormProps> = ({ mode }) => {
   const navigate = useNavigate();
-  const { login, signup, isLoading } = useAuth();
+  const location = useLocation();
+  const { login, signup, isLoading, isAuthenticated } = useAuth();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [name, setName] = useState('');
   const [role, setRole] = useState<UserRole>('participant');
   const [error, setError] = useState<string | null>(null);
+  
+  // Redirect if already authenticated
+  useEffect(() => {
+    if (isAuthenticated) {
+      console.log("User is authenticated, redirecting to dashboard");
+      navigate('/dashboard');
+    }
+  }, [isAuthenticated, navigate]);
 
   const handleRoleChange = (value: string) => setRole(value as UserRole);
 
@@ -33,6 +42,7 @@ const AuthForm: React.FC<AuthFormProps> = ({ mode }) => {
 
     try {
       if (mode === 'login') {
+        console.log("Attempting login with:", email);
         await login(email, password);
         toast({
           title: "Login successful!",
@@ -40,6 +50,7 @@ const AuthForm: React.FC<AuthFormProps> = ({ mode }) => {
         });
         navigate('/dashboard');
       } else {
+        console.log("Attempting signup with:", email, role);
         await signup(email, password, name, role);
         toast({
           title: "Account created!",
@@ -48,7 +59,13 @@ const AuthForm: React.FC<AuthFormProps> = ({ mode }) => {
         navigate('/dashboard');
       }
     } catch (err) {
+      console.error("Auth error:", err);
       setError(err instanceof Error ? err.message : 'An error occurred');
+      toast({
+        variant: "destructive",
+        title: "Authentication error",
+        description: err instanceof Error ? err.message : 'An error occurred during authentication',
+      });
     }
   };
 
