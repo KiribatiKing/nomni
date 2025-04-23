@@ -15,6 +15,7 @@ import NotFound from "./pages/NotFound";
 // Components
 import AuthForm from "./components/auth/AuthForm";
 import DashboardLayout from "./components/dashboard/DashboardLayout";
+import ParticipantDashboard from "./components/dashboard/ParticipantDashboard";
 import UserProfile from "./components/dashboard/UserProfile";
 import SubscriptionPlans from "./components/plans/SubscriptionPlans";
 import ShiftDashboard from "./components/dashboard/ShiftDashboard";
@@ -23,7 +24,6 @@ import ServiceProviderDashboard from "./components/dashboard/ServiceProviderDash
 import BackendDashboard from "./components/dashboard/BackendDashboard";
 
 const App = () => {
-  // Create a new QueryClient instance inside the component
   const queryClient = new QueryClient();
   
   return (
@@ -42,7 +42,7 @@ const App = () => {
                   
                   {/* Dashboard Routes */}
                   <Route path="/dashboard" element={<DashboardLayout />}>
-                    <Route index element={<div className="p-4">Dashboard Content</div>} />
+                    <Route index element={<ParticipantDashboard />} />
                     <Route path="settings" element={<div className="p-4">Settings Content</div>} />
                     <Route path="shift" element={<ShiftDashboard />} />
                     <Route path="spending" element={<SpendingDashboard />} />
