@@ -32,7 +32,6 @@ const AuthForm: React.FC<AuthFormProps> = ({ mode }) => {
     }
   }, [isAuthenticated, navigate]);
 
-  // Add back the missing handleRoleChange function
   const handleRoleChange = (value: string) => setRole(value as UserRole);
 
   const handleSubmit = async (e: React.FormEvent) => {
