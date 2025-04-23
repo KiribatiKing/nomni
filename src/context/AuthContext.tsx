@@ -69,7 +69,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         role: data.role,
         profilePicture: data.profile_picture || undefined,
         createdAt: data.created_at,
-        subscriptionTier: data.subscription_tier,
+        subscriptionTier: data.subscription_tier as 'basic' | 'premium' | null,
       });
     } else {
       setCurrentUser(null);
