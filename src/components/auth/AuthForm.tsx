@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '@/context/AuthContext';
@@ -18,23 +17,19 @@ interface AuthFormProps {
 
 const AuthForm: React.FC<AuthFormProps> = ({ mode }) => {
   const navigate = useNavigate();
-  const location = useLocation();
   const { login, signup, isLoading, isAuthenticated } = useAuth();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [name, setName] = useState('');
   const [role, setRole] = useState<UserRole>('participant');
   const [error, setError] = useState<string | null>(null);
-  
-  // Redirect if already authenticated
+
   useEffect(() => {
     if (isAuthenticated) {
       console.log("User is authenticated, redirecting to dashboard");
       navigate('/dashboard');
     }
   }, [isAuthenticated, navigate]);
-
-  const handleRoleChange = (value: string) => setRole(value as UserRole);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -48,23 +43,26 @@ const AuthForm: React.FC<AuthFormProps> = ({ mode }) => {
           title: "Login successful!",
           description: "Welcome back to Nomni Support.",
         });
-        navigate('/dashboard');
       } else {
-        console.log("Attempting signup with:", email, role);
+        console.log("Attempting signup with:", { email, name, role });
+        if (!name.trim()) {
+          throw new Error('Name is required');
+        }
         await signup(email, password, name, role);
         toast({
-          title: "Account created!",
-          description: "Welcome to Nomni Support.",
+          title: "Account created successfully!",
+          description: "Welcome to Nomni Support. You can now log in.",
         });
-        navigate('/dashboard');
       }
+      navigate('/dashboard');
     } catch (err) {
       console.error("Auth error:", err);
-      setError(err instanceof Error ? err.message : 'An error occurred');
+      const errorMessage = err instanceof Error ? err.message : 'An error occurred during authentication';
+      setError(errorMessage);
       toast({
         variant: "destructive",
         title: "Authentication error",
-        description: err instanceof Error ? err.message : 'An error occurred during authentication',
+        description: errorMessage,
       });
     }
   };

@@ -1,4 +1,3 @@
-
 import React, { createContext, useState, useContext, useEffect } from 'react';
 import { supabase } from "@/integrations/supabase/client";
 import { UserRole, User } from '@/types';
@@ -128,7 +127,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
   };
 
-  // Signup
   const signup = async (email: string, password: string, name: string, role: UserRole) => {
     setIsLoading(true);
     try {
@@ -137,7 +135,10 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         email,
         password,
         options: {
-          data: { name, role }
+          data: {
+            name,
+            role,
+          }
         }
       });
       
@@ -146,8 +147,13 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         throw new Error(error.message);
       }
       
-      console.log("Signup successful for:", data.user?.email);
-      // Session will be set by onAuthStateChange
+      if (data?.user) {
+        console.log("Signup successful for:", data.user.email);
+        toast({
+          title: "Account created",
+          description: "Please check your email to confirm your account.",
+        });
+      }
     } catch (error) {
       console.error("Signup error:", error);
       setIsLoading(false);
