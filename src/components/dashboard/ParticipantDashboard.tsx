@@ -2,7 +2,7 @@
 import React from 'react';
 import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
-import { Play, Stop } from "lucide-react";
+import { Play } from "lucide-react";
 
 const ParticipantDashboard = () => {
   const navigate = useNavigate();
