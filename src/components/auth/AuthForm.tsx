@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '@/context/AuthContext';
@@ -30,6 +31,9 @@ const AuthForm: React.FC<AuthFormProps> = ({ mode }) => {
       navigate('/dashboard');
     }
   }, [isAuthenticated, navigate]);
+
+  // Add back the missing handleRoleChange function
+  const handleRoleChange = (value: string) => setRole(value as UserRole);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
