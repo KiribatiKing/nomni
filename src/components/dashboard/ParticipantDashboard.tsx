@@ -11,13 +11,23 @@ const ParticipantDashboard = () => {
   const { isAuthenticated, currentUser } = useAuth();
 
   useEffect(() => {
-    if (isAuthenticated && currentUser) {
-      console.log("ParticipantDashboard: User authenticated as", currentUser.role);
-    }
+    console.log("ParticipantDashboard rendering");
+    console.log("Authentication status:", isAuthenticated);
+    console.log("Current user:", currentUser);
+    
+    // Show a toast notification to confirm component is rendering
+    toast({
+      title: "Dashboard Loaded",
+      description: "Your dashboard is now ready"
+    });
   }, [isAuthenticated, currentUser]);
 
   const handleShiftButton = () => {
-    console.log("Navigating to shift dashboard");
+    console.log("Shift button clicked");
+    toast({
+      title: "Navigating to Shift Dashboard",
+      description: "Loading your shift controls..."
+    });
     navigate('/dashboard/shift');
   };
 
