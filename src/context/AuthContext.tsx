@@ -1,3 +1,4 @@
+
 import React, { createContext, useState, useContext, useEffect } from 'react';
 import { supabase } from "@/integrations/supabase/client";
 import { UserRole, User } from '@/types';
@@ -79,6 +80,11 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         
       if (error) {
         console.error("Error fetching profile:", error);
+        toast({
+          variant: "destructive",
+          title: "Error loading profile",
+          description: "There was a problem loading your profile."
+        });
         setCurrentUser(null);
       } else if (data) {
         console.log("Profile fetched successfully:", data);
@@ -93,6 +99,32 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         });
       } else {
         console.log("No profile data found");
+        // If no profile found after signup, the trigger might have failed
+        // Let's check if we have user data in the session and create a profile manually
+        if (session?.user) {
+          const userData = session.user.user_metadata || {};
+          const { error: insertError } = await supabase
+            .from('profiles')
+            .insert({
+              id: userId,
+              email: session.user.email,
+              name: userData.name || session.user.email,
+              role: (userData.role as UserRole) || 'participant'
+            });
+            
+          if (insertError) {
+            console.error("Error creating profile:", insertError);
+            toast({
+              variant: "destructive",
+              title: "Error creating profile",
+              description: "There was a problem setting up your profile."
+            });
+          } else {
+            // Try fetching the profile again
+            fetchUserProfile(userId);
+            return;
+          }
+        }
         setCurrentUser(null);
       }
     } catch (err) {
@@ -153,6 +185,13 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
           title: "Account created",
           description: "Please check your email to confirm your account.",
         });
+        
+        // Make sure we wait for the database trigger to create the profile
+        setTimeout(() => {
+          if (data.user) {
+            fetchUserProfile(data.user.id);
+          }
+        }, 500);
       }
     } catch (error) {
       console.error("Signup error:", error);

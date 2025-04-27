@@ -8,19 +8,30 @@ import { useAuth } from '@/context/AuthContext';
 
 const ParticipantDashboard = () => {
   const navigate = useNavigate();
-  const { isAuthenticated, currentUser } = useAuth();
+  const { isAuthenticated, currentUser, isLoading } = useAuth();
 
   useEffect(() => {
+    // More extensive logging to debug the issue
     console.log("ParticipantDashboard rendering");
     console.log("Authentication status:", isAuthenticated);
     console.log("Current user:", currentUser);
+    console.log("Is loading:", isLoading);
     
     // Show a toast notification to confirm component is rendering
     toast({
       title: "Dashboard Loaded",
       description: "Your dashboard is now ready"
     });
-  }, [isAuthenticated, currentUser]);
+  }, [isAuthenticated, currentUser, isLoading]);
+
+  // If still loading, show a loading state
+  if (isLoading) {
+    return (
+      <div className="flex flex-col items-center justify-center min-h-[80vh] p-4">
+        <p className="text-lg">Loading your dashboard...</p>
+      </div>
+    );
+  }
 
   const handleShiftButton = () => {
     console.log("Shift button clicked");

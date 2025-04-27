@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '@/context/AuthContext';
 import { Navigate, Outlet, useLocation, Link, useNavigate } from 'react-router-dom';
@@ -18,6 +19,7 @@ import {
 } from 'lucide-react';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { toast } from "@/components/ui/use-toast";
 
 const DashboardLayout: React.FC = () => {
   const { isAuthenticated, currentUser, isLoading, userRole } = useAuth();
@@ -29,15 +31,27 @@ const DashboardLayout: React.FC = () => {
   const closeSidebar = () => setSidebarOpen(false);
 
   useEffect(() => {
+    // Debug logging
+    console.log("DashboardLayout rendering");
+    console.log("Authentication status:", isAuthenticated);
+    console.log("Current user:", currentUser);
+    console.log("Is loading:", isLoading);
+    console.log("User role:", userRole);
+    console.log("Current path:", location.pathname);
+    
     if (userRole === 'service-provider' && location.pathname === '/dashboard') {
       navigate('/dashboard/service-provider');
     }
-  }, [userRole, location.pathname, navigate]);
+  }, [userRole, location.pathname, navigate, isAuthenticated, currentUser, isLoading]);
 
   if (isLoading) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
+      <div className="min-h-screen flex flex-col items-center justify-center p-4">
         <div className="w-full max-w-md space-y-4">
+          <div className="text-center mb-4">
+            <h2 className="text-2xl font-bold">Loading your dashboard...</h2>
+            <p className="text-gray-500">Please wait while we prepare your experience.</p>
+          </div>
           <Skeleton className="h-10 w-full" />
           <Skeleton className="h-32 w-full" />
           <Skeleton className="h-10 w-full" />
@@ -47,6 +61,12 @@ const DashboardLayout: React.FC = () => {
   }
 
   if (!isAuthenticated) {
+    console.log("User not authenticated, redirecting to login");
+    toast({
+      variant: "destructive",
+      title: "Authentication required",
+      description: "Please log in to access the dashboard."
+    });
     return <Navigate to="/login" state={{ from: location }} replace />;
   }
 
@@ -147,9 +167,9 @@ const DashboardLayout: React.FC = () => {
               </AvatarFallback>
             </Avatar>
             <div>
-              <p className="font-medium">{currentUser?.name}</p>
+              <p className="font-medium">{currentUser?.name || 'Guest User'}</p>
               <p className="text-xs text-gray-500 capitalize">
-                {userRole?.replace('-', ' ')}
+                {userRole?.replace('-', ' ') || 'No Role'}
               </p>
             </div>
           </div>

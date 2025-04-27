@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '@/context/AuthContext';
@@ -18,35 +17,45 @@ interface AuthFormProps {
 
 const AuthForm: React.FC<AuthFormProps> = ({ mode }) => {
   const navigate = useNavigate();
+  const location = useLocation();
   const { login, signup, isLoading, isAuthenticated } = useAuth();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [name, setName] = useState('');
   const [role, setRole] = useState<UserRole>('participant');
   const [error, setError] = useState<string | null>(null);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
+  const from = location.state?.from?.pathname || '/dashboard';
 
   useEffect(() => {
+    console.log("AuthForm rendering, mode:", mode);
+    console.log("Is authenticated:", isAuthenticated);
+    console.log("Is loading:", isLoading);
+    
     if (isAuthenticated) {
-      console.log("User is authenticated, redirecting to dashboard");
-      navigate('/dashboard');
+      console.log("User is authenticated, redirecting to:", from);
+      navigate(from);
     }
-  }, [isAuthenticated, navigate]);
+  }, [isAuthenticated, navigate, from, mode, isLoading]);
 
   const handleRoleChange = (value: string) => setRole(value as UserRole);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError(null);
+    setIsSubmitting(true);
 
     try {
       if (mode === 'login') {
         console.log("Attempting login with:", email);
         await login(email, password);
+        console.log("Login successful, waiting for auth state to update");
+        
         toast({
           title: "Login successful!",
           description: "Welcome back to Nomni Support.",
         });
-        navigate('/dashboard');
       } else {
         console.log("Attempting signup with:", { email, name, role });
         
@@ -60,21 +69,27 @@ const AuthForm: React.FC<AuthFormProps> = ({ mode }) => {
         }
         
         await signup(email, password, name, role);
+        console.log("Signup successful, waiting for auth state to update");
+        
         toast({
           title: "Account created successfully!",
-          description: "Welcome to Nomni Support. You can now log in.",
+          description: "Welcome to Nomni Support. You can now use the platform.",
         });
-        navigate('/dashboard');
+        
+        setTimeout(() => {
+          if (!isAuthenticated) {
+            console.log("Manually navigating to dashboard after signup");
+            navigate('/dashboard');
+          }
+        }, 1000);
       }
     } catch (err) {
       console.error("Auth error:", err);
       let errorMessage = 'An error occurred during authentication';
       
-      // Handle specific Supabase error messages
       if (err instanceof Error) {
         errorMessage = err.message;
         
-        // Improve error messages
         if (errorMessage.includes('already registered')) {
           errorMessage = 'This email is already registered. Please try logging in instead.';
         } else if (errorMessage.includes('invalid email')) {
@@ -90,6 +105,8 @@ const AuthForm: React.FC<AuthFormProps> = ({ mode }) => {
         title: "Authentication error",
         description: errorMessage,
       });
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -179,9 +196,9 @@ const AuthForm: React.FC<AuthFormProps> = ({ mode }) => {
           <Button 
             type="submit" 
             className="w-full bg-ndis-blue hover:bg-blue-600"
-            disabled={isLoading}
+            disabled={isLoading || isSubmitting}
           >
-            {isLoading ? (
+            {(isLoading || isSubmitting) ? (
               <>
                 <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                 {mode === 'login' ? 'Logging in...' : 'Creating account...'}
