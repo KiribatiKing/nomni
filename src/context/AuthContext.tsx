@@ -37,12 +37,13 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     console.log("Setting up auth listener");
     
     // Subscribe to session events (do this first)
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(async (_event, session) => {
       console.log("Auth state changed:", _event, session?.user?.id);
       setSession(session);
       
       // Use setTimeout to prevent potential deadlock with Supabase auth
       if (session?.user?.id) {
+        setIsLoading(true); // Ensure loading state is active
         setTimeout(() => {
           fetchUserProfile(session.user.id);
         }, 0);
@@ -83,6 +84,9 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     console.log("Fetching profile for user:", userId);
     
     try {
+      // Small delay to ensure the profile has been created
+      await new Promise(resolve => setTimeout(resolve, 500));
+      
       const { data, error } = await supabase
         .from('profiles')
         .select('*')

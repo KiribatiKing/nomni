@@ -13,7 +13,6 @@ export const supabase = createClient<Database>(SUPABASE_URL, SUPABASE_PUBLISHABL
   auth: {
     persistSession: true,  // Enable session persistence
     autoRefreshToken: true, // Automatically refresh tokens
-    storageKey: 'supabase.auth.token', // Storage key for the auth token
     detectSessionInUrl: true, // Detect if there's a session in URL
     flowType: 'pkce' // Use PKCE flow for added security
   }
