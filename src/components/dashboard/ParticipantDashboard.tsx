@@ -12,12 +12,28 @@ const ParticipantDashboard = () => {
   const { isAuthenticated, currentUser, isLoading } = useAuth();
 
   useEffect(() => {
-    // More extensive logging to debug the issue
     console.log("ParticipantDashboard rendering");
     console.log("Authentication status:", isAuthenticated);
     console.log("Current user:", currentUser);
     console.log("Is loading:", isLoading);
-  }, [isAuthenticated, currentUser, isLoading]);
+
+    // If not authenticated and not loading anymore, redirect to login
+    if (!isLoading && !isAuthenticated) {
+      console.log("Not authenticated, redirecting to login");
+      toast({
+        variant: "destructive",
+        title: "Authentication required",
+        description: "Please log in to access the dashboard"
+      });
+      navigate('/login');
+    } else if (!isLoading && isAuthenticated && currentUser) {
+      // Show welcome toast only when authenticated and loaded
+      toast({
+        title: "Welcome to your dashboard",
+        description: `Hello, ${currentUser.name || 'there'}!`
+      });
+    }
+  }, [isAuthenticated, isLoading, navigate, currentUser]);
 
   // If still loading, show a loading state
   if (isLoading) {
@@ -30,24 +46,10 @@ const ParticipantDashboard = () => {
     );
   }
 
-  // If not authenticated and not loading anymore, redirect to login
-  useEffect(() => {
-    if (!isLoading && !isAuthenticated) {
-      console.log("Not authenticated, redirecting to login");
-      toast({
-        variant: "destructive",
-        title: "Authentication required",
-        description: "Please log in to access the dashboard"
-      });
-      navigate('/login');
-    } else if (!isLoading && isAuthenticated) {
-      // Show welcome toast only when authenticated and loaded
-      toast({
-        title: "Dashboard Loaded",
-        description: "Welcome to your dashboard"
-      });
-    }
-  }, [isAuthenticated, isLoading, navigate]);
+  // Don't render anything if auth state is uncertain
+  if (!isAuthenticated) {
+    return null;
+  }
 
   const handleShiftButton = () => {
     console.log("Shift button clicked");
@@ -57,11 +59,6 @@ const ParticipantDashboard = () => {
     });
     navigate('/dashboard/shift');
   };
-
-  // Don't render anything if auth state is uncertain
-  if (!isAuthenticated) {
-    return null;
-  }
 
   return (
     <div className="flex flex-col items-center justify-center min-h-[80vh] p-4 animate-fade-in">
