@@ -54,13 +54,6 @@ export type Database = {
             referencedRelation: "contacts"
             referencedColumns: ["id"]
           },
-          {
-            foreignKeyName: "appointments_user_id_fkey"
-            columns: ["user_id"]
-            isOneToOne: false
-            referencedRelation: "users"
-            referencedColumns: ["id"]
-          },
         ]
       }
       contacts: {
@@ -74,7 +67,7 @@ export type Database = {
           user_id: string
         }
         Insert: {
-          created_at: string
+          created_at?: string
           email?: string | null
           id?: string
           name: string
@@ -91,15 +84,7 @@ export type Database = {
           role?: string | null
           user_id?: string
         }
-        Relationships: [
-          {
-            foreignKeyName: "contacts_user_id_fkey"
-            columns: ["user_id"]
-            isOneToOne: false
-            referencedRelation: "users"
-            referencedColumns: ["id"]
-          },
-        ]
+        Relationships: []
       }
       profiles: {
         Row: {
@@ -174,15 +159,7 @@ export type Database = {
           user_id?: string | null
           weekday_rate?: number | null
         }
-        Relationships: [
-          {
-            foreignKeyName: "service_providers_user_id_fkey"
-            columns: ["user_id"]
-            isOneToOne: false
-            referencedRelation: "users"
-            referencedColumns: ["id"]
-          },
-        ]
+        Relationships: []
       }
       shifts: {
         Row: {
@@ -236,13 +213,6 @@ export type Database = {
             referencedRelation: "support_workers"
             referencedColumns: ["id"]
           },
-          {
-            foreignKeyName: "shifts_user_id_fkey"
-            columns: ["user_id"]
-            isOneToOne: false
-            referencedRelation: "users"
-            referencedColumns: ["id"]
-          },
         ]
       }
       support_workers: {
@@ -255,7 +225,7 @@ export type Database = {
           id: string
           last_name: string | null
           phone_number: string | null
-          support_provider_id: string
+          support_provider_id: string | null
           updated_at: string | null
           user_id: string
         }
@@ -268,7 +238,7 @@ export type Database = {
           id?: string
           last_name?: string | null
           phone_number?: string | null
-          support_provider_id?: string
+          support_provider_id?: string | null
           updated_at?: string | null
           user_id: string
         }
@@ -281,19 +251,11 @@ export type Database = {
           id?: string
           last_name?: string | null
           phone_number?: string | null
-          support_provider_id?: string
+          support_provider_id?: string | null
           updated_at?: string | null
           user_id?: string
         }
-        Relationships: [
-          {
-            foreignKeyName: "support_workers_user_id_fkey"
-            columns: ["user_id"]
-            isOneToOne: false
-            referencedRelation: "users"
-            referencedColumns: ["id"]
-          },
-        ]
+        Relationships: []
       }
       tasks: {
         Row: {
@@ -313,7 +275,7 @@ export type Database = {
           due_date: string
           id?: string
           priority?: string | null
-          status?: string
+          status: string
           task_name: string
           updated_at: string
           user_id: string
@@ -329,62 +291,6 @@ export type Database = {
           updated_at?: string
           user_id?: string
         }
-        Relationships: [
-          {
-            foreignKeyName: "tasks_user_id_fkey"
-            columns: ["user_id"]
-            isOneToOne: false
-            referencedRelation: "users"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
-      users: {
-        Row: {
-          address: string | null
-          coordinator_contact: string | null
-          coordinator_name: string | null
-          created_at: string
-          date_of_birth: string | null
-          email: string
-          first_name: string
-          funding_amount: number
-          id: string
-          last_name: string
-          phone_number: string
-          role: string
-          updated_at: string | null
-        }
-        Insert: {
-          address?: string | null
-          coordinator_contact?: string | null
-          coordinator_name?: string | null
-          created_at?: string
-          date_of_birth?: string | null
-          email: string
-          first_name: string
-          funding_amount: number
-          id?: string
-          last_name: string
-          phone_number: string
-          role: string
-          updated_at?: string | null
-        }
-        Update: {
-          address?: string | null
-          coordinator_contact?: string | null
-          coordinator_name?: string | null
-          created_at?: string
-          date_of_birth?: string | null
-          email?: string
-          first_name?: string
-          funding_amount?: number
-          id?: string
-          last_name?: string
-          phone_number?: string
-          role?: string
-          updated_at?: string | null
-        }
         Relationships: []
       }
     }
@@ -395,13 +301,7 @@ export type Database = {
       [_ in never]: never
     }
     Enums: {
-      user_role:
-        | "participant"
-        | "caregiver"
-        | "support-worker"
-        | "service-provider"
-        | "admin"
-        | "advocate"
+      user_role: "admin" | "editor" | "viewer"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -517,14 +417,7 @@ export type CompositeTypes<
 export const Constants = {
   public: {
     Enums: {
-      user_role: [
-        "participant",
-        "caregiver",
-        "support-worker",
-        "service-provider",
-        "admin",
-        "advocate",
-      ],
+      user_role: ["admin", "editor", "viewer"],
     },
   },
 } as const
