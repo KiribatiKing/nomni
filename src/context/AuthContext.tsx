@@ -41,8 +41,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       console.log("Auth state changed:", _event, session?.user?.id);
       setSession(session);
       
+      // Use setTimeout to prevent potential deadlock with Supabase auth
       if (session?.user?.id) {
-        // Use setTimeout to prevent potential deadlock with Supabase auth
         setTimeout(() => {
           fetchUserProfile(session.user.id);
         }, 0);
@@ -53,17 +53,28 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     });
 
     // On mount, get session
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      console.log("Got initial session:", session?.user?.id);
-      setSession(session);
-      if (session?.user?.id) {
-        fetchUserProfile(session.user.id);
-      } else {
+    const initializeAuth = async () => {
+      try {
+        const { data: { session } } = await supabase.auth.getSession();
+        console.log("Got initial session:", session?.user?.id);
+        setSession(session);
+        
+        if (session?.user?.id) {
+          await fetchUserProfile(session.user.id);
+        } else {
+          setIsLoading(false);
+        }
+      } catch (error) {
+        console.error("Error getting initial session:", error);
         setIsLoading(false);
       }
-    });
+    };
+    
+    initializeAuth();
 
-    return () => subscription.unsubscribe();
+    return () => {
+      subscription.unsubscribe();
+    };
   }, []);
 
   // Fetch user profile from Supabase
@@ -99,32 +110,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         });
       } else {
         console.log("No profile data found");
-        // If no profile found after signup, the trigger might have failed
-        // Let's check if we have user data in the session and create a profile manually
-        if (session?.user) {
-          const userData = session.user.user_metadata || {};
-          const { error: insertError } = await supabase
-            .from('profiles')
-            .insert({
-              id: userId,
-              email: session.user.email,
-              name: userData.name || session.user.email,
-              role: (userData.role as UserRole) || 'participant'
-            });
-            
-          if (insertError) {
-            console.error("Error creating profile:", insertError);
-            toast({
-              variant: "destructive",
-              title: "Error creating profile",
-              description: "There was a problem setting up your profile."
-            });
-          } else {
-            // Try fetching the profile again
-            fetchUserProfile(userId);
-            return;
-          }
-        }
         setCurrentUser(null);
       }
     } catch (err) {
@@ -183,15 +168,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         console.log("Signup successful for:", data.user.email);
         toast({
           title: "Account created",
-          description: "Please check your email to confirm your account.",
+          description: "Your account has been created. You'll be logged in automatically.",
         });
-        
-        // Make sure we wait for the database trigger to create the profile
-        setTimeout(() => {
-          if (data.user) {
-            fetchUserProfile(data.user.id);
-          }
-        }, 500);
       }
     } catch (error) {
       console.error("Signup error:", error);

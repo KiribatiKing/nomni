@@ -5,6 +5,7 @@ import { useNavigate } from "react-router-dom";
 import { Play } from "lucide-react";
 import { toast } from "@/components/ui/use-toast";
 import { useAuth } from '@/context/AuthContext';
+import { Skeleton } from '@/components/ui/skeleton';
 
 const ParticipantDashboard = () => {
   const navigate = useNavigate();
@@ -16,22 +17,37 @@ const ParticipantDashboard = () => {
     console.log("Authentication status:", isAuthenticated);
     console.log("Current user:", currentUser);
     console.log("Is loading:", isLoading);
-    
-    // Show a toast notification to confirm component is rendering
-    toast({
-      title: "Dashboard Loaded",
-      description: "Your dashboard is now ready"
-    });
   }, [isAuthenticated, currentUser, isLoading]);
 
   // If still loading, show a loading state
   if (isLoading) {
     return (
       <div className="flex flex-col items-center justify-center min-h-[80vh] p-4">
-        <p className="text-lg">Loading your dashboard...</p>
+        <Skeleton className="h-8 w-48 mb-4" />
+        <Skeleton className="h-24 w-64 mb-8" />
+        <Skeleton className="h-4 w-72" />
       </div>
     );
   }
+
+  // If not authenticated and not loading anymore, redirect to login
+  useEffect(() => {
+    if (!isLoading && !isAuthenticated) {
+      console.log("Not authenticated, redirecting to login");
+      toast({
+        variant: "destructive",
+        title: "Authentication required",
+        description: "Please log in to access the dashboard"
+      });
+      navigate('/login');
+    } else if (!isLoading && isAuthenticated) {
+      // Show welcome toast only when authenticated and loaded
+      toast({
+        title: "Dashboard Loaded",
+        description: "Welcome to your dashboard"
+      });
+    }
+  }, [isAuthenticated, isLoading, navigate]);
 
   const handleShiftButton = () => {
     console.log("Shift button clicked");
@@ -41,6 +57,11 @@ const ParticipantDashboard = () => {
     });
     navigate('/dashboard/shift');
   };
+
+  // Don't render anything if auth state is uncertain
+  if (!isAuthenticated) {
+    return null;
+  }
 
   return (
     <div className="flex flex-col items-center justify-center min-h-[80vh] p-4 animate-fade-in">
@@ -56,12 +77,6 @@ const ParticipantDashboard = () => {
         Start Shift
       </Button>
       
-      {!isAuthenticated && (
-        <div className="mt-4 p-4 bg-yellow-100 rounded-md text-yellow-700 border border-yellow-300">
-          You need to be logged in to use this feature.
-        </div>
-      )}
-
       <div className="mt-8 text-center text-gray-600">
         <p>Click the green button above to start your shift and track your activities.</p>
       </div>
