@@ -1,7 +1,7 @@
 
 import { useState } from 'react';
 import { supabase } from "@/integrations/supabase/client";
-import { User } from '@/types';
+import { User, UserRole } from '@/types';
 import { toast } from "@/components/ui/use-toast";
 
 // Match the demo mode flag from authService
@@ -10,7 +10,7 @@ const DEMO_PROFILE = {
   id: 'demo-user-id',
   email: 'demo@example.com',
   name: 'Demo User',
-  role: 'participant',
+  role: 'participant' as UserRole,
   profilePicture: undefined,
   createdAt: new Date().toISOString(),
   subscriptionTier: 'basic' as 'basic' | 'premium'
