@@ -14,14 +14,7 @@ export const supabase = createClient<Database>(SUPABASE_URL, SUPABASE_PUBLISHABL
     persistSession: true,  // Enable session persistence
     autoRefreshToken: true, // Automatically refresh tokens
     detectSessionInUrl: true, // Detect if there's a session in URL
-    flowType: 'pkce', // Use PKCE flow for added security
-    // Add provider specific configuration for email signups
-    providers: {
-      email: {
-        enabled: true,  // Explicitly enable email provider
-        sendMagicLink: false // Disable magic links, use password-based signup
-      }
-    }
+    flowType: 'pkce' // Use PKCE flow for added security
   }
 });
 

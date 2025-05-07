@@ -18,7 +18,7 @@ export const useProfileFetch = () => {
       const { data, error } = await supabase
         .from('profiles')
         .select('*')
-        .eq('id', userId)
+        .eq('id', userId as any)
         .single();
         
       if (error) {
