@@ -1,8 +1,9 @@
 
 import React, { createContext, useState, useContext, useEffect } from 'react';
-import { supabase } from "@/integrations/supabase/client";
 import { UserRole, User } from '@/types';
 import { toast } from "@/components/ui/use-toast";
+import { authService } from "@/services/authService";
+import { useProfileFetch } from "@/hooks/useProfileFetch";
 
 // AuthContext definition
 interface AuthContextType {
@@ -31,21 +32,21 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [session, setSession] = useState<any>(null);
   const [currentUser, setCurrentUser] = useState<User | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const { fetchUserProfile } = useProfileFetch();
 
   // Listen to auth state + fetch profile
   useEffect(() => {
     console.log("Setting up auth listener");
     
-    // Subscribe to session events (do this first)
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(async (_event, session) => {
-      console.log("Auth state changed:", _event, session?.user?.id);
+    // Subscribe to session events
+    const { data: { subscription } } = authService.onAuthStateChange((session) => {
       setSession(session);
       
       // Use setTimeout to prevent potential deadlock with Supabase auth
       if (session?.user?.id) {
         setIsLoading(true); // Ensure loading state is active
         setTimeout(() => {
-          fetchUserProfile(session.user.id);
+          handleProfileFetch(session.user.id);
         }, 0);
       } else {
         setCurrentUser(null);
@@ -56,12 +57,12 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     // On mount, get session
     const initializeAuth = async () => {
       try {
-        const { data: { session } } = await supabase.auth.getSession();
+        const session = await authService.getSession();
         console.log("Got initial session:", session?.user?.id);
         setSession(session);
         
         if (session?.user?.id) {
-          await fetchUserProfile(session.user.id);
+          await handleProfileFetch(session.user.id);
         } else {
           setIsLoading(false);
         }
@@ -78,47 +79,12 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     };
   }, []);
 
-  // Fetch user profile from Supabase
-  const fetchUserProfile = async (userId: string) => {
+  // Handle profile fetching
+  const handleProfileFetch = async (userId: string) => {
     setIsLoading(true);
-    console.log("Fetching profile for user:", userId);
-    
     try {
-      // Small delay to ensure the profile has been created
-      await new Promise(resolve => setTimeout(resolve, 500));
-      
-      const { data, error } = await supabase
-        .from('profiles')
-        .select('*')
-        .eq('id', userId)
-        .single();
-        
-      if (error) {
-        console.error("Error fetching profile:", error);
-        toast({
-          variant: "destructive",
-          title: "Error loading profile",
-          description: "There was a problem loading your profile."
-        });
-        setCurrentUser(null);
-      } else if (data) {
-        console.log("Profile fetched successfully:", data);
-        setCurrentUser({
-          id: data.id,
-          email: data.email,
-          name: data.name,
-          role: data.role,
-          profilePicture: data.profile_picture || undefined,
-          createdAt: data.created_at,
-          subscriptionTier: data.subscription_tier as 'basic' | 'premium' | null,
-        });
-      } else {
-        console.log("No profile data found");
-        setCurrentUser(null);
-      }
-    } catch (err) {
-      console.error("Unexpected error fetching profile:", err);
-      setCurrentUser(null);
+      const profile = await fetchUserProfile(userId);
+      setCurrentUser(profile);
     } finally {
       setIsLoading(false);
     }
@@ -128,18 +94,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const login = async (email: string, password: string) => {
     setIsLoading(true);
     try {
-      console.log("Attempting login for:", email);
-      const { data, error } = await supabase.auth.signInWithPassword({
-        email,
-        password,
-      });
-      
-      if (error) {
-        console.error("Login error:", error);
-        throw new Error(error.message);
-      }
-      
-      console.log("Login successful for:", data.user?.email);
+      await authService.login(email, password);
       // Session will be set by onAuthStateChange
     } catch (error) {
       console.error("Login error:", error);
@@ -151,31 +106,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const signup = async (email: string, password: string, name: string, role: UserRole) => {
     setIsLoading(true);
     try {
-      console.log("Attempting signup for:", email, "with role:", role);
-      const { data, error } = await supabase.auth.signUp({
-        email,
-        password,
-        options: {
-          data: {
-            name,
-            role,
-          },
-          emailRedirectTo: window.location.origin + '/dashboard'
-        }
-      });
-      
-      if (error) {
-        console.error("Signup error:", error);
-        throw new Error(error.message);
-      }
-      
-      if (data?.user) {
-        console.log("Signup successful for:", data.user.email);
-        toast({
-          title: "Account created",
-          description: "Your account has been created. You'll be logged in automatically.",
-        });
-      }
+      await authService.signup(email, password, name, role);
     } catch (error) {
       console.error("Signup error:", error);
       setIsLoading(false);
@@ -187,11 +118,9 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const logout = async () => {
     setIsLoading(true);
     try {
-      console.log("Attempting logout");
-      await supabase.auth.signOut();
+      await authService.logout();
       setSession(null);
       setCurrentUser(null);
-      console.log("Logout successful");
     } catch (error) {
       console.error("Logout error:", error);
       toast({
