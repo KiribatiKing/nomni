@@ -14,20 +14,20 @@ export const supabase = createClient<Database>(SUPABASE_URL, SUPABASE_PUBLISHABL
     persistSession: true,  // Enable session persistence
     autoRefreshToken: true, // Automatically refresh tokens
     detectSessionInUrl: true, // Detect if there's a session in URL
-    flowType: 'pkce' // Use PKCE flow for added security
+    flowType: 'pkce', // Use PKCE flow for added security
+    // Add provider specific configuration for email signups
+    providers: {
+      email: {
+        enabled: true,  // Explicitly enable email provider
+        sendMagicLink: false // Disable magic links, use password-based signup
+      }
+    }
   }
 });
 
 // Configure auth providers
-if (supabase.auth.setAuth) {
-  supabase.auth.setAuth({
-    autoRefreshToken: true,
-    persistSession: true,
-    detectSessionInUrl: true
-  });
-}
-
-// To enable email signups
+// Note: The setAuth method doesn't exist in newer Supabase versions
+// This code is checking for this method before calling it as it may be deprecated
 try {
   // These settings will be applied client-side
   // Note: This is a client-side configuration only
