@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '@/context/AuthContext';
@@ -90,7 +91,9 @@ const AuthForm: React.FC<AuthFormProps> = ({ mode }) => {
       if (err instanceof Error) {
         errorMessage = err.message;
         
-        if (errorMessage.includes('already registered')) {
+        if (errorMessage.includes('Email signups are disabled')) {
+          errorMessage = 'Email registration is currently disabled. Please contact the administrator to enable email signups.';
+        } else if (errorMessage.includes('already registered')) {
           errorMessage = 'This email is already registered. Please try logging in instead.';
         } else if (errorMessage.includes('invalid email')) {
           errorMessage = 'Please enter a valid email address';
