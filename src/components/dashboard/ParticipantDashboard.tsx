@@ -6,6 +6,7 @@ import { Play } from "lucide-react";
 import { toast } from "@/components/ui/use-toast";
 import { useAuth } from '@/context/AuthContext';
 import { Skeleton } from '@/components/ui/skeleton';
+import FundingChart from './FundingChart';
 
 const ParticipantDashboard = () => {
   const navigate = useNavigate();
@@ -61,21 +62,52 @@ const ParticipantDashboard = () => {
   };
 
   return (
-    <div className="flex flex-col items-center justify-center min-h-[80vh] p-4 animate-fade-in">
-      <h1 className="text-3xl font-bold mb-10 text-center">Welcome to Your Dashboard</h1>
-      
-      <Button 
-        onClick={handleShiftButton}
-        variant="default"
-        size="lg"
-        className="bg-green-500 hover:bg-green-600 text-white font-bold py-6 px-10 rounded-lg shadow-lg mb-8 w-64 h-24 text-2xl flex items-center justify-center gap-3 transform transition-transform hover:scale-105"
-      >
-        <Play className="w-8 h-8" />
-        Start Shift
-      </Button>
-      
-      <div className="mt-8 text-center text-gray-600">
-        <p>Click the green button above to start your shift and track your activities.</p>
+    <div className="page-container animate-fade-in">
+      <div className="max-w-5xl mx-auto space-y-8">
+        {/* Welcome Section with Start Shift Button */}
+        <div className="flex flex-col items-center text-center space-y-6 py-8">
+          <h1 className="text-4xl font-bold text-foreground">
+            Welcome back, {currentUser?.name || 'there'}!
+          </h1>
+          <p className="text-muted-foreground text-lg max-w-2xl">
+            Ready to start your shift? Track your activities and manage your NDIS funding all in one place.
+          </p>
+          
+          <Button 
+            onClick={handleShiftButton}
+            size="lg"
+            className="bg-[#4CAF50] hover:bg-[#45a049] text-white font-semibold py-8 px-12 rounded-lg shadow-xl mt-4 h-auto text-2xl flex items-center justify-center gap-3 transform transition-all hover:scale-105 hover:shadow-2xl"
+          >
+            <Play className="w-10 h-10" />
+            Start Shift
+          </Button>
+        </div>
+
+        {/* Funding Chart */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          <FundingChart />
+          
+          {/* Quick Stats Card */}
+          <div className="space-y-4">
+            <div className="bg-card rounded-lg border p-6 shadow-sm">
+              <h3 className="text-lg font-semibold mb-4">Quick Stats</h3>
+              <div className="space-y-3">
+                <div className="flex justify-between items-center">
+                  <span className="text-muted-foreground">Total Shifts</span>
+                  <span className="text-2xl font-bold text-primary">24</span>
+                </div>
+                <div className="flex justify-between items-center">
+                  <span className="text-muted-foreground">This Month</span>
+                  <span className="text-2xl font-bold text-secondary">8</span>
+                </div>
+                <div className="flex justify-between items-center">
+                  <span className="text-muted-foreground">Hours Logged</span>
+                  <span className="text-2xl font-bold text-accent">156</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   );
